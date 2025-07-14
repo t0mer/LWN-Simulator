@@ -3,10 +3,6 @@ FROM golang:1.21 AS builder
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-    nodejs \
-    npm \
-    python3 \
-    python3-pip \
     make \
     git
 
@@ -22,10 +18,9 @@ WORKDIR /app
 # Copy project files
 COPY . .
 
-# Install Python requirements (if needed by the backend)
-RUN pip3 install flask
 
-# Build frontend and embed into Go using statik
+RUN make install-dep
+
 RUN make build
 
 # Stage 2: Runtime image
@@ -37,7 +32,7 @@ WORKDIR /app
 COPY --from=builder /app .
 
 # Expose app port (adjust if needed)
-EXPOSE 8080
+EXPOSE 8000
 
 # Start the application
-CMD ["./main"]
+CMD ["./bin/lwnsimulator"]
